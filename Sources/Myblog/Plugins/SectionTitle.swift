@@ -14,16 +14,7 @@ extension PublishingStep where Site == Myblog {
     static func sctionTitle() -> Self {
         .step(named: "sctionTitle" ){ content in
             content.mutateAllSections { section in
-                switch section.id {
-                    case .index:
-                        section.title = "首页"
-                    case .posts:
-                        section.title = "文章"
-                    case .about:
-                        section.title = "关于"
-                    case .tags:
-                        section.title = "标签"
-                }
+                section.title = section.id.title
             }
         }
     }

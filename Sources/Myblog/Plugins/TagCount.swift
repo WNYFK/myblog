@@ -8,7 +8,7 @@
 import Foundation
 import Publish
 
-//计算每个tag的数量
+// MARK: 计算tag数目
 extension Plugin{
     static func countTag() -> Self{
         return Plugin(name: "countTag"){ content in

@@ -10,6 +10,19 @@ struct Myblog: Website {
         case posts
         case tags
         case about
+        
+        var title: String {
+            switch self {
+                case .index:
+                    return "首页"
+                case .posts:
+                    return "文章"
+                case .tags:
+                    return "标签"
+                case .about:
+                    return "关于"
+            }
+        }
     }
     
     struct ItemMetadata: WebsiteItemMetadata {
