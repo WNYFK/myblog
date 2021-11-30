@@ -224,7 +224,7 @@ extension Node where Context == HTML.BodyContext {
                     .class("logo"),
                     .a(
                         .href("/"),
-                        .h2("陈斌的记事本")
+                        .h2("\(context.site.name)")
                     )
                 ),
                 .if(sectionIDs.count > 1, nav(for: context, selectedSection: selectedSection))
