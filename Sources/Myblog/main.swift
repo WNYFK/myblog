@@ -2,12 +2,14 @@ import Foundation
 import Publish
 import Plot
 import HighlightJSPublishPlugin
-
 // This type acts as the configuration for your website.
 struct Myblog: Website {
     enum SectionID: String, WebsiteSectionID {
         // Add the sections that you want your website to contain here:
+        case index
         case posts
+        case tags
+        case about
     }
     
     struct ItemMetadata: WebsiteItemMetadata {
@@ -16,9 +18,9 @@ struct Myblog: Website {
     
     // Update these properties to configure your website:
     var url = URL(string: "https://your-website-url.com")!
-    var name = "WNYFK"
-    var description = "A description of WNYFK"
-    var language: Language { .english }
+    var name = "陈斌的Swift记事本"
+    var description = "陈斌 Publish Blogs"
+    var language: Language { .chinese }
     var imagePath: Path? { nil }
 }
 
@@ -30,11 +32,13 @@ try Myblog().publish(
         .installPlugin(.highlightJS()), //语法高亮
         .copyResources(),
         .addMarkdownFiles(),
-//        .setSctionTitle(), //修改section 标题
-//        .installPlugin(.setDateFormatter()), //设置时间显示格式
-//        .installPlugin(.countTag()), //计算tag的数量,tag必须在 addMarkDownFiles 之后,否则alltags没有值
+        .sctionTitle(), //修改section 标题
+        .installPlugin(.dateFormatter()), //设置时间显示格式
+        .installPlugin(.countTag()), //计算tag的数量,tag必须在 addMarkDownFiles 之后,否则alltags没有值
+        .installPlugin(.colorfulTags(defaultClass: "tag", variantPrefix: "variant", numberOfVariants: 8)), //给tag多种颜色
         .sortItems(by: \.date, order: .descending), //对所有文章排序
-        //        .installPlugin(.rssSetting(including:[.posts,.project])),
+        .generateHTML(withTheme: .fatTheme),
+//        .installPlugin(.rssSetting(including:[.posts])),
         .generateRSSFeed(
             including: [.posts],
             itemPredicate: nil
@@ -42,3 +46,5 @@ try Myblog().publish(
         .generateSiteMap(),
         .unwrap(.gitHub("wnyfk/wnyfk.github.io", useSSH: true), PublishingStep.deploy)
     ])
+
+
