@@ -31,7 +31,7 @@ struct Myblog: Website {
     
     // Update these properties to configure your website:
     var url = URL(string: "https://your-website-url.com")!
-    var name = "陈斌的Swift记事本"
+    var name = "陈斌的记事本"
     var description = "陈斌 Publish Blogs"
     var language: Language { .chinese }
     var imagePath: Path? { nil }
