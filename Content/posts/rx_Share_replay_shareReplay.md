@@ -1,8 +1,8 @@
 ### RxSwift学习记录- share vs replay vs shareReplay
 
 #### 问题描述
+![图片](https://github.com/WNYFK/wnyfk.github.io/blob/master/images/icon.png?raw=true)
 
-![图片](/icon.png)
 多个订阅者导致Observable重复执行
 
 ```
