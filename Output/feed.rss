@@ -1,4 +1,67 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>陈斌的记事本</title><description>陈斌 Publish Blogs</description><link>https://your-website-url.com</link><language>zh</language><lastBuildDate>Wed, 1 Dec 2021 11:43:17 +0800</lastBuildDate><pubDate>Wed, 1 Dec 2021 11:43:17 +0800</pubDate><ttl>250</ttl><atom:link href="https://your-website-url.com/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://your-website-url.com/posts/ios_blogs</guid><title>iOS博客列表</title><description>iOS的博客.</description><link>https://your-website-url.com/posts/ios_blogs</link><pubDate>Wed, 1 Dec 2021 11:47:00 +0800</pubDate><content:encoded><![CDATA[<h2>周报</h2><ul><li><a href="https://github.com/SwiftOldDriver/iOS-Weekly/releases">老司机iOS周报</a></li><li><a href="https://mp.weixin.qq.com/s?__biz=Mzg4MjU2Mzc1MQ==&mid=2247486791&idx=1&sn=2695a508ea45e43527875058ad106e6d&chksm=cf55828ff8220b990eb722b4fb149b8cd424133d05646ea7e369ab4597c1e97503714a6f20dd&token=1722840270&lang=zh_CN#rd">DNS 服务器</a></li></ul><h2>原理</h2><ul><li><a href="https://juejin.cn/post/7015861914370736136">iOS编码对包大小的影响</a></li><li><a href="https://mp.weixin.qq.com/s/MIun-eV4_J1hXGDRjGoLaw">百度符号化</a></li><li><a href="https://mp.weixin.qq.com/s/TVRYXhiOXIsMmXZo9GmEVA">字节符号化</a></li><li><a href="https://kemchenj.github.io/2020-10-02/">swift atomic</a></li><li><a href="https://www.emergetools.com/blog/posts/iOS15LaunchTime">iOS15 launchTime</a></li><li><a href="https://mp.weixin.qq.com/s/ElGEsJoh3Y1-BWlvz1yJ9w">UIView &amp; CALayer</a></li></ul><h2>三方库</h2><ul><li><a href="https://juejin.cn/post/6885605205380562952">YYCache</a></li><li></li></ul><h2>新特性</h2><ul><li><a href="https://emptytheory.com/2021/08/14/creating-custom-parseable-format-styles-in-ios-15/">iOS15 format</a></li><li><a href="https://mp.weixin.qq.com/s/DopuYyy479eSjgns3iaWaw">Async and Await in Swift 5.5</a></li><li><a href="https://xiaozhuanlan.com/wwdc21">WWDC21内参</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://your-website-url.com/posts/2021-12-01</guid><title>Markdown 语法和 MWeb 写作使用说明</title><description></description><link>https://your-website-url.com/posts/2021-12-01</link><pubDate>Wed, 1 Dec 2021 11:43:11 +0800</pubDate><content:encoded><![CDATA[<h1>Markdown 语法和 MWeb 写作使用说明</h1><h2>Markdown 的设计哲学</h2><blockquote><p>Markdown 的目標是實現「易讀易寫」。 不過最需要強調的便是它的可讀性。一份使用 Markdown 格式撰寫的文件應該可以直接以純文字發佈，並且看起來不會像是由許多標籤或是格式指令所構成。 Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>寫作</em>用語言。<!-- more --></p></blockquote><h2>本文约定</h2><p>如果有写 <code>效果如下：</code>， 在 MWeb 编辑状态下只有用 <code>CMD + 4</code> 或 <code>CMD + R</code> 预览才可以看效果。</p><h2>标题</h2><p>Markdown 语法：</p><pre data-language="undefined"><code>
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>陈斌的记事本</title><description>陈斌 Publish Blogs</description><link>https://your-website-url.com</link><language>zh</language><lastBuildDate>Tue, 14 Dec 2021 17:41:13 +0800</lastBuildDate><pubDate>Tue, 14 Dec 2021 17:41:13 +0800</pubDate><ttl>250</ttl><atom:link href="https://your-website-url.com/feed.rss" rel="self" type="application/rss+xml"/><item><guid isPermaLink="true">https://your-website-url.com/posts/rx_Share_replay_shareReplay</guid><title>rx_Share_replay_shareReplay</title><description></description><link>https://your-website-url.com/posts/rx_Share_replay_shareReplay</link><pubDate>Tue, 14 Dec 2021 17:38:06 +0800</pubDate><content:encoded><![CDATA[<h3>RxSwift学习记录- share vs replay vs shareReplay</h3><h4>问题描述</h4><p>多个订阅者导致Observable重复执行</p><pre data-language="undefined"><code>
+let results: Observable<String> = Observable<Int>.interval(.seconds(1), scheduler: MainScheduler.instance)
+    .map { "\($0)" }
+    .flatMapLatest(convert)
+    
+func convert(str: String) -> Observable<String> {
+        Observable<String>.create { observer in
+            print("convert啊啊啊啊啊啊")
+            observer.onNext("\(str)===convert")
+            observer.onCompleted()
+            return Disposables.create()
+        }
+    }
+</code></pre><p>下面三个订阅会使Observable创建三次，原本希望的是三个订阅者订阅同一次</p><pre data-language="undefined"><code>
+let results = results.share()
+results.subscribe(onNext: { str in
+    print("第一个订阅者:\(str)")
+}).disposed(by: disposeBag)
+results.subscribe(onNext: { str in
+    print("第二个订阅者:\(str)")
+}).disposed(by: disposeBag)
+results.subscribe(onNext: { str in
+    print("第三个订阅者:\(str)")
+}).disposed(by: self.disposeBag)
+
+</code></pre><h4>share</h4><p>所有订阅者订阅后共用同一个Observable</p><pre data-language="undefined"><code>
+let results = results.share()
+results.subscribe(onNext: { str in
+    print("第一个订阅者:\(str)")
+}).disposed(by: disposeBag)
+results.subscribe(onNext: { str in
+    print("第二个订阅者:\(str)")
+}).disposed(by: disposeBag)
+delay(4) { 
+    results.subscribe(onNext: { str in
+        print("第三个订阅者:\(str)")
+    }).disposed(by: self.disposeBag)
+}
+</code></pre><p>结果</p><pre data-language="undefined"><code>
+convert啊啊啊啊啊啊
+第一个订阅者:2===convert
+第二个订阅者:2===convert
+convert啊啊啊啊啊啊
+第一个订阅者:3===convert
+第二个订阅者:3===convert
+convert啊啊啊啊啊啊
+第一个订阅者:4===convert
+第二个订阅者:4===convert
+第三个订阅者:4===convert
+</code></pre><h4>publish</h4><p>需手动<code>connect</code>，<code>connect</code>后开始发射值</p><pre data-language="undefined"><code>
+let results = results.publish()
+results.subscribe(onNext: { str in
+    print("第一个订阅者:\(str)")
+}).disposed(by: disposeBag)
+results.subscribe(onNext: { str in
+    print("第二个订阅者:\(str)")
+}).disposed(by: disposeBag)
+_ = results.connect()
+delay(4) { 
+    results.subscribe(onNext: { str in
+        print("第三个订阅者:\(str)")
+    }).disposed(by: self.disposeBag)
+}
+</code></pre><h4>replayAll</h4><p>后面订阅者会订阅后会收到所有之前的信号</p>]]></content:encoded></item><item><guid isPermaLink="true">https://your-website-url.com/posts/reactorkit</guid><title>reactorkit</title><description></description><link>https://your-website-url.com/posts/reactorkit</link><pubDate>Mon, 13 Dec 2021 18:54:22 +0800</pubDate><content:encoded><![CDATA[<h3>flux相关</h3><ol><li><a href="https://zhuanlan.zhihu.com/p/20263396">flux原理图解</a></li><li><a href="https://www.jianshu.com/p/87c32a0fce28">flux详细概述</a></li></ol>]]></content:encoded></item><item><guid isPermaLink="true">https://your-website-url.com/posts/ios_blogs</guid><title>iOS博客列表</title><description>iOS的博客.</description><link>https://your-website-url.com/posts/ios_blogs</link><pubDate>Wed, 1 Dec 2021 11:47:00 +0800</pubDate><content:encoded><![CDATA[<h2>周报</h2><ul><li><a href="https://github.com/SwiftOldDriver/iOS-Weekly/releases">老司机iOS周报</a></li><li><a href="https://mp.weixin.qq.com/s?__biz=Mzg4MjU2Mzc1MQ==&mid=2247486791&idx=1&sn=2695a508ea45e43527875058ad106e6d&chksm=cf55828ff8220b990eb722b4fb149b8cd424133d05646ea7e369ab4597c1e97503714a6f20dd&token=1722840270&lang=zh_CN#rd">DNS 服务器</a></li></ul><h2>原理</h2><ul><li><a href="https://juejin.cn/post/7015861914370736136">iOS编码对包大小的影响</a></li><li><a href="https://mp.weixin.qq.com/s/MIun-eV4_J1hXGDRjGoLaw">百度符号化</a></li><li><a href="https://mp.weixin.qq.com/s/TVRYXhiOXIsMmXZo9GmEVA">字节符号化</a></li><li><a href="https://kemchenj.github.io/2020-10-02/">swift atomic</a></li><li><a href="https://www.emergetools.com/blog/posts/iOS15LaunchTime">iOS15 launchTime</a></li><li><a href="https://mp.weixin.qq.com/s/ElGEsJoh3Y1-BWlvz1yJ9w">UIView &amp; CALayer</a></li></ul><h2>三方库</h2><ul><li><a href="https://juejin.cn/post/6885605205380562952">YYCache</a></li><li></li></ul><h2>新特性</h2><ul><li><a href="https://emptytheory.com/2021/08/14/creating-custom-parseable-format-styles-in-ios-15/">iOS15 format</a></li><li><a href="https://mp.weixin.qq.com/s/DopuYyy479eSjgns3iaWaw">Async and Await in Swift 5.5</a></li><li><a href="https://xiaozhuanlan.com/wwdc21">WWDC21内参</a></li></ul>]]></content:encoded></item><item><guid isPermaLink="true">https://your-website-url.com/posts/2021-12-01</guid><title>Markdown 语法和 MWeb 写作使用说明</title><description></description><link>https://your-website-url.com/posts/2021-12-01</link><pubDate>Wed, 1 Dec 2021 11:43:11 +0800</pubDate><content:encoded><![CDATA[<h1>Markdown 语法和 MWeb 写作使用说明</h1><h2>Markdown 的设计哲学</h2><blockquote><p>Markdown 的目標是實現「易讀易寫」。 不過最需要強調的便是它的可讀性。一份使用 Markdown 格式撰寫的文件應該可以直接以純文字發佈，並且看起來不會像是由許多標籤或是格式指令所構成。 Markdown 的語法有個主要的目的：用來作為一種網路內容的<em>寫作</em>用語言。<!-- more --></p></blockquote><h2>本文约定</h2><p>如果有写 <code>效果如下：</code>， 在 MWeb 编辑状态下只有用 <code>CMD + 4</code> 或 <code>CMD + R</code> 预览才可以看效果。</p><h2>标题</h2><p>Markdown 语法：</p><pre data-language="undefined"><code>
 # 第一级标题 `<h1>` 
 ## 第二级标题 `<h2>` 
 ###### 第六级标题 `<h6>` 
